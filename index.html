@@ -352,15 +352,17 @@
 <script>
 const WORKER_URL = "https://bold-waterfall-6ab4.benjaminlammers1.workers.dev/entries";
 
+// Key = Notion page ID of the Gewohnheit, value = display name + weekly goal
+// This way matching works regardless of what the log entry is named.
 const HABITS = {
-  "Krafttraining":                 { goal: 2 },
-  "Ausdauertraining":              { goal: 3 },
-  "Dehnen":                        { goal: 7 },
-  "Sonnenlicht nach dem Aufstehen":{ goal: 7 },
-  "Entspannungsübung":             { goal: 7 },
-  "Clean-Sleep-Routine":           { goal: 7 },
-  "Gesund gegessen":               { goal: 7 },
-  "Feierabend-Ritual":             { goal: 7 },
+  "312a0dfe-7375-818f-8200-e063a6eddfbc": { name: "Krafttraining",                  goal: 2 },
+  "312a0dfe-7375-81b8-aa20-eea6ec996c54": { name: "Ausdauertraining",               goal: 3 },
+  "312a0dfe-7375-81a5-9fa5-de9952fc0fe7": { name: "Dehnen",                         goal: 7 },
+  "312a0dfe-7375-8130-b644-d1d27233c05a": { name: "Sonnenlicht nach dem Aufstehen", goal: 7 },
+  "312a0dfe-7375-81db-b83c-c642106d9466": { name: "Entspannungsübung",              goal: 7 },
+  "312a0dfe-7375-8173-802d-e63e2a8e69f4": { name: "Clean-Sleep-Routine",            goal: 7 },
+  "312a0dfe-7375-813b-8483-ffc6b0067ae5": { name: "Gesund gegessen",                goal: 7 },
+  "312a0dfe-7375-81fd-873d-d19111d367c6": { name: "Feierabend-Ritual",              goal: 7 },
 };
 
 const MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
@@ -404,10 +406,10 @@ function render(entries) {
 
 function renderWeek(entries) {
   const ws = getMonday(today), we = new Date(ws); we.setDate(we.getDate()+7);
-  const wc = {}; for (const n of Object.keys(HABITS)) wc[n] = 0;
-  for (const e of entries) { const d = new Date(e.date); if (d>=ws&&d<we&&wc[e.name]!==undefined) wc[e.name]++; }
-  document.getElementById('week').innerHTML = Object.entries(HABITS).map(([name,{goal}]) => {
-    const count = wc[name]||0, pct = Math.min(100, Math.round(count/goal*100));
+  const wc = {}; for (const id of Object.keys(HABITS)) wc[id] = 0;
+  for (const e of entries) { const d = new Date(e.date); if (d>=ws&&d<we&&wc[e.habit_id]!==undefined) wc[e.habit_id]++; }
+  document.getElementById('week').innerHTML = Object.entries(HABITS).map(([id,{name,goal}]) => {
+    const count = wc[id]||0, pct = Math.min(100, Math.round(count/goal*100));
     const cls = pct>=100?'done':pct>=50?'half':'low';
     const short = name.replace('nach dem Aufstehen','').replace('Feierabend-','').trim();
     return `<div class="week-item">
@@ -419,8 +421,8 @@ function renderWeek(entries) {
 }
 
 function renderStreaks(entries) {
-  const byH = {}; for (const n of Object.keys(HABITS)) byH[n] = new Set();
-  for (const e of entries) if (byH[e.name]) byH[e.name].add(e.date.slice(0,10));
+  const byH = {}; for (const id of Object.keys(HABITS)) byH[id] = new Set();
+  for (const e of entries) if (byH[e.habit_id]) byH[e.habit_id].add(e.date.slice(0,10));
 
   function calcStreak(ds, goal) {
     if (!ds.size) return 0;
@@ -441,8 +443,8 @@ function renderStreaks(entries) {
     }
   }
 
-  document.getElementById('streaks').innerHTML = Object.entries(HABITS).map(([name,{goal}]) => {
-    const s = calcStreak(byH[name], goal);
+  document.getElementById('streaks').innerHTML = Object.entries(HABITS).map(([id,{name,goal}]) => {
+    const s = calcStreak(byH[id], goal);
     const cls = s>=7?'s-fire':s>=3?'s-mid':'s-low';
     const em  = s>=7?'🔥':s>=3?'✨':'';
     const unit = goal===7?'Tage':'Wo.';
@@ -460,7 +462,10 @@ function renderStreaks(entries) {
 function renderHeatmap(entries, filter) {
   const counts = {};
   for (const e of entries) {
-    if (filter!=='all' && e.name!==filter) continue;
+    if (filter !== 'all') {
+      // filter is a habit_id
+      if (e.habit_id !== filter) continue;
+    }
     counts[e.date] = (counts[e.date]||0)+1;
   }
   const maxV = Math.max(1, ...Object.values(counts).length ? Object.values(counts) : [1]);
@@ -490,13 +495,13 @@ function renderHeatmap(entries, filter) {
 }
 
 function renderRanking(entries) {
-  const totals = {}; for (const n of Object.keys(HABITS)) totals[n]=0;
-  for (const e of entries) if (totals[e.name]!==undefined) totals[e.name]++;
+  const totals = {}; for (const id of Object.keys(HABITS)) totals[id]=0;
+  for (const e of entries) if (totals[e.habit_id]!==undefined) totals[e.habit_id]++;
   const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('best').innerHTML = sorted.slice(0,4).map(([n,c],i)=>
-    `<div class="rank-item"><div class="rank-medal">${MEDALS[i]||'·'}</div><div class="rank-name">${n}</div><div class="rank-count">${c}×</div></div>`).join('');
-  document.getElementById('worst').innerHTML = sorted.slice(-4).reverse().map(([n,c])=>
-    `<div class="rank-item"><div class="rank-medal">↗</div><div class="rank-name">${n}</div><div class="rank-count">${c}×</div></div>`).join('');
+  document.getElementById('best').innerHTML = sorted.slice(0,4).map(([id,c],i)=>
+    `<div class="rank-item"><div class="rank-medal">${MEDALS[i]||'·'}</div><div class="rank-name">${HABITS[id].name}</div><div class="rank-count">${c}×</div></div>`).join('');
+  document.getElementById('worst').innerHTML = sorted.slice(-4).reverse().map(([id,c])=>
+    `<div class="rank-item"><div class="rank-medal">↗</div><div class="rank-name">${HABITS[id].name}</div><div class="rank-count">${c}×</div></div>`).join('');
 }
 
 function showTip(e,date,cnt) {
@@ -509,8 +514,8 @@ function showTip(e,date,cnt) {
 function hideTip() { document.getElementById('tip').style.display='none'; }
 
 const sel = document.getElementById('hm-filter');
-for (const name of Object.keys(HABITS)) {
-  const o=document.createElement('option'); o.value=name; o.textContent=name; sel.appendChild(o);
+for (const [id, {name}] of Object.entries(HABITS)) {
+  const o=document.createElement('option'); o.value=id; o.textContent=name; sel.appendChild(o);
 }
 sel.addEventListener('change', () => renderHeatmap(ALL_ENTRIES, sel.value));
 
