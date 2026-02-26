@@ -406,8 +406,10 @@ function render(entries) {
 
 function renderWeek(entries) {
   const ws = getMonday(today), we = new Date(ws); we.setDate(we.getDate()+7);
+  // String comparison avoids timezone offset issues with UTC date parsing
+  const wsStr = ws.toLocaleDateString('sv'), weStr = we.toLocaleDateString('sv');
   const wc = {}; for (const id of Object.keys(HABITS)) wc[id] = 0;
-  for (const e of entries) { const d = new Date(e.date); if (d>=ws&&d<we&&wc[e.habit_id]!==undefined) wc[e.habit_id]++; }
+  for (const e of entries) { if (e.date >= wsStr && e.date < weStr && wc[e.habit_id]!==undefined) wc[e.habit_id]++; }
   document.getElementById('week').innerHTML = Object.entries(HABITS).map(([id,{name,goal}]) => {
     const count = wc[id]||0, pct = Math.min(100, Math.round(count/goal*100));
     const cls = pct>=100?'done':pct>=50?'half':'low';
