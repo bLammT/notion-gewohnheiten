@@ -5,132 +5,388 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Habit Tracker</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
   :root {
-    --bg:#0e0f11;--surface:#16181c;--surface2:#1e2127;--border:#2a2d35;
-    --accent:#c8f060;--accent2:#60c8f0;--text:#e8eaed;--muted:#6b7280;--warn:#fbbf24;
+    --bg: #ffffff;
+    --bg-secondary: #f7f6f3;
+    --surface: #ffffff;
+    --surface-hover: #f1f0ed;
+    --border: #e9e8e4;
+    --border-light: #f0eeeb;
+    --text: #37352f;
+    --text-secondary: #787774;
+    --text-light: #9b9a97;
+    --accent: #2eaadc;
+    --accent-bg: #e8f4fb;
+    --green: #0f7b6c;
+    --green-bg: #e9f5f3;
+    --green-mid: #4dab9a;
+    --yellow: #dfab01;
+    --yellow-bg: #fef9e7;
+    --red: #e03e3e;
+    --red-bg: #fbe4e4;
+    --orange: #d9730d;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
   }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;padding:2rem;}
-  header{display:flex;align-items:baseline;gap:1rem;margin-bottom:2.5rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem;flex-wrap:wrap;}
-  header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-.02em;color:var(--accent);}
-  header span{color:var(--muted);font-size:.8rem;}
-  .refresh-btn{margin-left:auto;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:.7rem;padding:.35rem .9rem;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s;}
-  .refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .status{font-size:.7rem;color:var(--muted);margin-bottom:1.5rem;min-height:1.2em;}
-  .status.err{color:#f87171;}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;}
-  .card-full{grid-column:1/-1;}
-  .card-title{font-family:'Syne',sans-serif;font-weight:600;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem;}
-  /* WEEK */
-  .week-list{display:flex;flex-direction:column;gap:.75rem;}
-  .week-item{display:grid;grid-template-columns:155px 1fr 55px;align-items:center;gap:.75rem;}
-  .week-name{font-size:.72rem;}
-  .bar-bg{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;}
-  .bar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.16,1,.3,1);}
-  .bar-done{background:var(--accent);}.bar-half{background:var(--accent2);}.bar-low{background:var(--border);}
-  .week-pct{font-size:.7rem;text-align:right;}
-  .pct-done{color:var(--accent);}.pct-half{color:var(--accent2);}.pct-low{color:var(--muted);}
-  /* STREAK */
-  .streak-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:.75rem;}
-  .streak-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.875rem;}
-  .streak-name{font-size:.65rem;color:var(--muted);margin-bottom:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .streak-value{font-family:'Syne',sans-serif;font-weight:700;font-size:1.75rem;line-height:1;}
-  .streak-label{font-size:.6rem;color:var(--muted);margin-top:.15rem;}
-  .s-fire{color:var(--warn);}.s-mid{color:var(--accent2);}.s-low{color:var(--muted);}
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-secondary);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 32px 24px;
+  }
+
+  /* HEADER */
+  header {
+    max-width: 900px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .page-icon { font-size: 28px; }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -.01em;
+  }
+
+  .page-date {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-left: auto;
+  }
+
+  .refresh-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .refresh-btn:hover { background: var(--surface-hover); }
+
+  /* STATUS */
+  .status {
+    max-width: 900px;
+    margin: 0 auto 16px;
+    font-size: 12px;
+    color: var(--text-light);
+    min-height: 18px;
+  }
+
+  .status.err { color: var(--red); }
+
+  /* LAYOUT */
+  .container { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+  .row { display: grid; gap: 16px; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 14px;
+  }
+
+  /* WEEK PROGRESS */
+  .week-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .week-item {
+    display: grid;
+    grid-template-columns: 148px 1fr 42px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .week-name { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .bar-bg {
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width .6s cubic-bezier(.16,1,.3,1);
+  }
+
+  .bar-done { background: var(--green); }
+  .bar-half { background: var(--accent); }
+  .bar-low  { background: var(--border); }
+
+  .week-pct { font-size: 12px; text-align: right; font-weight: 500; }
+  .pct-done { color: var(--green); }
+  .pct-half { color: var(--accent); }
+  .pct-low  { color: var(--text-light); }
+
+  /* STREAK – 2x4 grid */
+  .streak-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 8px;
+  }
+
+  .streak-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .streak-name {
+    font-size: 11px;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .streak-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .streak-value {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .streak-unit { font-size: 11px; color: var(--text-light); }
+  .s-fire { color: var(--orange); }
+  .s-mid  { color: var(--accent); }
+  .s-low  { color: var(--text-secondary); }
+
   /* HEATMAP */
-  .heatmap-header{margin-bottom:.875rem;}
-  .habit-filter{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.7rem;padding:.35rem .75rem;border-radius:6px;cursor:pointer;outline:none;}
-  .habit-filter:focus{border-color:var(--accent);}
-  .heatmap-wrapper{overflow-x:auto;}
-  .heatmap-grid{display:grid;gap:2px;min-width:max-content;}
-  .hm-cell{width:13px;height:13px;border-radius:2px;background:var(--surface2);cursor:pointer;transition:transform .1s;}
-  .hm-cell:hover{transform:scale(1.5);z-index:10;}
-  .hm-cell[data-v="1"]{background:#1a3a1a;}.hm-cell[data-v="2"]{background:#2a5c2a;}
-  .hm-cell[data-v="3"]{background:#3d8c3d;}.hm-cell[data-v="4"]{background:#5cb85c;}
-  .hm-cell[data-v="5"]{background:var(--accent);opacity:.9;}
-  .hm-month{font-size:.58rem;color:var(--muted);align-self:end;padding-bottom:1px;}
-  .hm-day{font-size:.58rem;color:var(--muted);align-self:center;text-align:right;padding-right:2px;}
-  .heatmap-legend{display:flex;align-items:center;gap:.35rem;margin-top:.75rem;font-size:.65rem;color:var(--muted);}
-  .leg{width:12px;height:12px;border-radius:2px;}
-  .tip{position:fixed;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:.7rem;padding:.35rem .65rem;border-radius:6px;pointer-events:none;z-index:200;display:none;white-space:nowrap;}
-  .ranking{display:flex;flex-direction:column;gap:.5rem;}
-  .rank-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .875rem;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
-  .rank-medal{font-size:1rem;width:1.5rem;text-align:center;}
-  .rank-name{font-size:.72rem;flex:1;}
-  .rank-count{font-size:.68rem;color:var(--muted);}
-  .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;height:14px;margin-bottom:.5rem;}
-  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-  @media(max-width:680px){.grid{grid-template-columns:1fr;}.card-full{grid-column:1;}.week-item{grid-template-columns:100px 1fr 45px;}}
+  .heatmap-header { margin-bottom: 12px; }
+
+  .habit-filter {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .habit-filter:focus { border-color: var(--accent); }
+
+  .heatmap-wrapper { overflow-x: auto; }
+
+  .heatmap-grid {
+    display: grid;
+    gap: 2px;
+    min-width: max-content;
+  }
+
+  .hm-cell {
+    width: 12px; height: 12px;
+    border-radius: 2px;
+    background: var(--border-light);
+    cursor: pointer;
+    transition: transform .1s;
+  }
+
+  .hm-cell:hover { transform: scale(1.4); z-index: 10; }
+  .hm-cell[data-v="1"] { background: #d3e9e7; }
+  .hm-cell[data-v="2"] { background: #a3d4cf; }
+  .hm-cell[data-v="3"] { background: #6bbdb5; }
+  .hm-cell[data-v="4"] { background: #35a89e; }
+  .hm-cell[data-v="5"] { background: var(--green); }
+
+  .hm-month { font-size: 10px; color: var(--text-light); align-self: end; padding-bottom: 1px; }
+  .hm-day   { font-size: 10px; color: var(--text-light); align-self: center; text-align: right; padding-right: 3px; }
+
+  .heatmap-legend {
+    display: flex; align-items: center; gap: 4px;
+    margin-top: 8px; font-size: 11px; color: var(--text-light);
+  }
+
+  .leg { width: 11px; height: 11px; border-radius: 2px; }
+
+  /* TOOLTIP */
+  .tip {
+    position: fixed;
+    background: var(--text);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 200;
+    display: none;
+    white-space: nowrap;
+  }
+
+  /* RANKING */
+  .ranking { display: flex; flex-direction: column; gap: 6px; }
+
+  .rank-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+  }
+
+  .rank-medal { font-size: 14px; width: 20px; text-align: center; }
+  .rank-name  { font-size: 13px; flex: 1; }
+  .rank-count { font-size: 12px; color: var(--text-light); font-weight: 500; }
+
+  /* SKELETON */
+  .skeleton {
+    background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 50%, var(--border-light) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 4px;
+    height: 13px;
+    margin-bottom: 8px;
+  }
+
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  @media (max-width: 700px) {
+    .row-2, .row-3 { grid-template-columns: 1fr; }
+    .streak-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, auto); }
+    .week-item { grid-template-columns: 110px 1fr 38px; }
+  }
 </style>
 </head>
 <body>
 <div class="tip" id="tip"></div>
+
 <header>
-  <h1>🏋️ Habit Tracker</h1>
-  <span id="date-label"></span>
+  <div class="page-icon">🏋️</div>
+  <div class="page-title">Habit Tracker</div>
+  <div class="page-date" id="date-label"></div>
   <button class="refresh-btn" onclick="loadData()">↺ Aktualisieren</button>
 </header>
+
 <div class="status" id="status">Lade Daten…</div>
 
-<div class="grid">
-  <div class="card">
-    <div class="card-title">📅 Wochenfortschritt</div>
-    <div id="week"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+<div class="container">
+
+  <!-- Row 1: Week + Streaks -->
+  <div class="row row-2">
+    <div class="card">
+      <div class="card-title">📅 Wochenfortschritt</div>
+      <div class="week-list" id="week">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🔥 Aktuelle Streaks</div>
+      <div class="streak-grid" id="streaks">
+        <div class="skeleton" style="grid-column:1/-1;height:60px"></div>
+      </div>
+    </div>
   </div>
+
+  <!-- Row 2: Heatmap -->
   <div class="card">
-    <div class="card-title">🔥 Aktuelle Streaks</div>
-    <div id="streaks"><div class="skeleton"></div><div class="skeleton"></div></div>
-  </div>
-  <div class="card card-full">
     <div class="card-title">🗓️ Aktivitäts-Heatmap</div>
     <div class="heatmap-header">
       <select class="habit-filter" id="hm-filter">
         <option value="all">Alle Gewohnheiten</option>
       </select>
     </div>
-    <div class="heatmap-wrapper"><div id="heatmap"><div class="skeleton" style="height:100px"></div></div></div>
+    <div class="heatmap-wrapper"><div id="heatmap"><div class="skeleton" style="height:90px"></div></div></div>
     <div class="heatmap-legend">
       Weniger
-      <div class="leg" style="background:var(--surface2)"></div>
-      <div class="leg" style="background:#1a3a1a"></div>
-      <div class="leg" style="background:#2a5c2a"></div>
-      <div class="leg" style="background:#3d8c3d"></div>
-      <div class="leg" style="background:#5cb85c"></div>
-      <div class="leg" style="background:var(--accent);opacity:.9"></div>
+      <div class="leg" style="background:var(--border-light)"></div>
+      <div class="leg" style="background:#d3e9e7"></div>
+      <div class="leg" style="background:#a3d4cf"></div>
+      <div class="leg" style="background:#6bbdb5"></div>
+      <div class="leg" style="background:#35a89e"></div>
+      <div class="leg" style="background:var(--green)"></div>
       Mehr
     </div>
   </div>
-  <div class="card">
-    <div class="card-title">⭐ Beste Gewohnheiten (gesamt)</div>
-    <div class="ranking" id="best"><div class="skeleton"></div><div class="skeleton"></div></div>
+
+  <!-- Row 3: Ranking -->
+  <div class="row row-2">
+    <div class="card">
+      <div class="card-title">⭐ Beste Gewohnheiten (gesamt)</div>
+      <div class="ranking" id="best"><div class="skeleton"></div><div class="skeleton"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💪 Ausbaufähig (gesamt)</div>
+      <div class="ranking" id="worst"><div class="skeleton"></div><div class="skeleton"></div></div>
+    </div>
   </div>
-  <div class="card">
-    <div class="card-title">💪 Ausbaufähig (gesamt)</div>
-    <div class="ranking" id="worst"><div class="skeleton"></div><div class="skeleton"></div></div>
-  </div>
+
 </div>
 
 <script>
-// ── CONFIG – set your Cloudflare Worker URL here ───────────────────────────
 const WORKER_URL = "https://bold-waterfall-6ab4.benjaminlammers1.workers.dev/entries";
-// ──────────────────────────────────────────────────────────────────────────
 
 const HABITS = {
-  "Krafttraining":{goal:2},"Ausdauertraining":{goal:3},"Dehnen":{goal:7},
-  "Sonnenlicht nach dem Aufstehen":{goal:7},"Entspannungsübung":{goal:7},
-  "Clean-Sleep-Routine":{goal:7},"Gesund gegessen":{goal:7},"Feierabend-Ritual":{goal:7}
+  "Krafttraining":                 { goal: 2 },
+  "Ausdauertraining":              { goal: 3 },
+  "Dehnen":                        { goal: 7 },
+  "Sonnenlicht nach dem Aufstehen":{ goal: 7 },
+  "Entspannungsübung":             { goal: 7 },
+  "Clean-Sleep-Routine":           { goal: 7 },
+  "Gesund gegessen":               { goal: 7 },
+  "Feierabend-Ritual":             { goal: 7 },
 };
 
-const MONTHS=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-const DAYS=['Mo','','Mi','','Fr','','So'];
-const medals=['🥇','🥈','🥉'];
+const MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const DAYS   = ['Mo','','Mi','','Fr','','So'];
+const MEDALS = ['🥇','🥈','🥉'];
 
-const today=new Date();today.setHours(0,0,0,0);
-document.getElementById('date-label').textContent=today.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const today = new Date(); today.setHours(0,0,0,0);
+document.getElementById('date-label').textContent =
+  today.toLocaleDateString('de-DE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 
-function getMonday(d){const r=new Date(d);const day=r.getDay();r.setDate(r.getDate()-(day===0?6:day-1));r.setHours(0,0,0,0);return r;}
+function getMonday(d) {
+  const r = new Date(d), day = r.getDay();
+  r.setDate(r.getDate() - (day === 0 ? 6 : day - 1));
+  r.setHours(0,0,0,0); return r;
+}
 
 let ALL_ENTRIES = [];
 
@@ -141,10 +397,11 @@ async function loadData() {
     const res = await fetch(WORKER_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     ALL_ENTRIES = await res.json();
-    document.getElementById('status').textContent = `✓ ${ALL_ENTRIES.length} Einträge geladen · ${new Date().toLocaleTimeString('de-DE')}`;
+    document.getElementById('status').textContent =
+      `✓ ${ALL_ENTRIES.length} Einträge · Stand: ${new Date().toLocaleTimeString('de-DE')}`;
     render(ALL_ENTRIES);
   } catch(e) {
-    document.getElementById('status').textContent = `Fehler: ${e.message} – Worker-URL konfiguriert?`;
+    document.getElementById('status').textContent = `Fehler: ${e.message}`;
     document.getElementById('status').className = 'status err';
   }
 }
@@ -157,75 +414,116 @@ function render(entries) {
 }
 
 function renderWeek(entries) {
-  const weekStart=getMonday(today);
-  const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+7);
-  const wc={};for(const n of Object.keys(HABITS))wc[n]=0;
-  for(const e of entries){const d=new Date(e.date);if(d>=weekStart&&d<weekEnd&&wc[e.name]!==undefined)wc[e.name]++;}
-  document.getElementById('week').innerHTML=Object.entries(HABITS).map(([name,{goal}])=>{
-    const count=wc[name]||0,pct=Math.min(100,Math.round(count/goal*100));
-    const cls=pct>=100?'done':pct>=50?'half':'low';
-    const short=name.replace('nach dem Aufstehen','').replace('Feierabend-','').trim();
-    return `<div class="week-item"><div class="week-name">${short}</div><div class="bar-bg"><div class="bar-fill bar-${cls}" style="width:${pct}%"></div></div><div class="week-pct pct-${cls}">${count}/${goal}</div></div>`;
+  const ws = getMonday(today), we = new Date(ws); we.setDate(we.getDate()+7);
+  const wc = {}; for (const n of Object.keys(HABITS)) wc[n] = 0;
+  for (const e of entries) { const d = new Date(e.date); if (d>=ws&&d<we&&wc[e.name]!==undefined) wc[e.name]++; }
+  document.getElementById('week').innerHTML = Object.entries(HABITS).map(([name,{goal}]) => {
+    const count = wc[name]||0, pct = Math.min(100, Math.round(count/goal*100));
+    const cls = pct>=100?'done':pct>=50?'half':'low';
+    const short = name.replace('nach dem Aufstehen','').replace('Feierabend-','').trim();
+    return `<div class="week-item">
+      <div class="week-name">${short}</div>
+      <div class="bar-bg"><div class="bar-fill bar-${cls}" style="width:${pct}%"></div></div>
+      <div class="week-pct pct-${cls}">${count}/${goal}</div>
+    </div>`;
   }).join('');
 }
 
 function renderStreaks(entries) {
-  const byH={};for(const n of Object.keys(HABITS))byH[n]=new Set();
-  for(const e of entries)if(byH[e.name])byH[e.name].add(e.date.slice(0,10));
-  function calcStreak(ds,goal){
-    if(!ds.size)return 0;
-    if(goal===7){let s=0,d=new Date(today);if(!ds.has(d.toISOString().slice(0,10)))d.setDate(d.getDate()-1);while(ds.has(d.toISOString().slice(0,10))){s++;d.setDate(d.getDate()-1);}return s;}
-    else{let s=0,ws=new Date(getMonday(today));for(let i=0;i<52;i++){const we=new Date(ws);we.setDate(we.getDate()+7);const hit=[...ds].some(dd=>{const x=new Date(dd);return x>=ws&&x<we;});if(hit)s++;else if(i>0)break;ws.setDate(ws.getDate()-7);}return s;}
+  const byH = {}; for (const n of Object.keys(HABITS)) byH[n] = new Set();
+  for (const e of entries) if (byH[e.name]) byH[e.name].add(e.date.slice(0,10));
+
+  function calcStreak(ds, goal) {
+    if (!ds.size) return 0;
+    if (goal === 7) {
+      let s=0, d=new Date(today);
+      if (!ds.has(d.toISOString().slice(0,10))) d.setDate(d.getDate()-1);
+      while (ds.has(d.toISOString().slice(0,10))) { s++; d.setDate(d.getDate()-1); }
+      return s;
+    } else {
+      let s=0, ws=new Date(getMonday(today));
+      for (let i=0; i<52; i++) {
+        const we=new Date(ws); we.setDate(we.getDate()+7);
+        const hit=[...ds].some(dd=>{const x=new Date(dd);return x>=ws&&x<we;});
+        if (hit) s++; else if (i>0) break;
+        ws.setDate(ws.getDate()-7);
+      }
+      return s;
+    }
   }
-  document.getElementById('streaks').innerHTML=Object.entries(HABITS).map(([name,{goal}])=>{
-    const s=calcStreak(byH[name],goal),cls=s>=7?'s-fire':s>=3?'s-mid':'s-low';
-    const em=s>=7?'🔥':s>=3?'✨':'·',unit=goal===7?'Tage':'Wochen';
-    const short=name.length>20?name.slice(0,19)+'…':name;
-    return `<div class="streak-item"><div class="streak-name">${short}</div><div class="streak-value ${cls}">${s} ${em}</div><div class="streak-label">${unit} in Folge</div></div>`;
+
+  document.getElementById('streaks').innerHTML = Object.entries(HABITS).map(([name,{goal}]) => {
+    const s = calcStreak(byH[name], goal);
+    const cls = s>=7?'s-fire':s>=3?'s-mid':'s-low';
+    const em  = s>=7?'🔥':s>=3?'✨':'';
+    const unit = goal===7?'Tage':'Wo.';
+    const short = name.replace('nach dem Aufstehen','').replace('Feierabend-','').replace('übung','üb.').trim();
+    return `<div class="streak-item">
+      <div class="streak-name">${short}</div>
+      <div class="streak-row">
+        <div class="streak-value ${cls}">${s}</div>
+        <div class="streak-unit">${unit} ${em}</div>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function renderHeatmap(entries, filter) {
-  const counts={};
-  for(const e of entries){if(filter!=='all'&&e.name!==filter)continue;counts[e.date]=(counts[e.date]||0)+1;}
-  const maxV=Math.max(1,...Object.values(counts).length?Object.values(counts):[1]);
-  const start=new Date(getMonday(today));start.setDate(start.getDate()-51*7);
-  const weeks=[];const cur=new Date(start);
-  while(cur<=today){const w=[];for(let d=0;d<7;d++){w.push(new Date(cur));cur.setDate(cur.getDate()+1);}weeks.push(w);}
-  const COLS=weeks.length;
-  let html=`<div class="heatmap-grid" style="grid-template-columns:22px repeat(${COLS},13px);grid-template-rows:16px repeat(7,13px);">`;
-  html+='<div></div>';
-  let lastM=-1;
-  for(let w=0;w<weeks.length;w++){const m=weeks[w][0].getMonth();if(m!==lastM){html+=`<div class="hm-month" style="grid-column:${w+2};grid-row:1">${MONTHS[m]}</div>`;lastM=m;}}
-  for(let d=0;d<7;d++){
+  const counts = {};
+  for (const e of entries) {
+    if (filter!=='all' && e.name!==filter) continue;
+    counts[e.date] = (counts[e.date]||0)+1;
+  }
+  const maxV = Math.max(1, ...Object.values(counts).length ? Object.values(counts) : [1]);
+  const start = new Date(getMonday(today)); start.setDate(start.getDate()-51*7);
+  const weeks = []; const cur = new Date(start);
+  while (cur<=today) { const w=[]; for(let d=0;d<7;d++){w.push(new Date(cur));cur.setDate(cur.getDate()+1);} weeks.push(w); }
+  const COLS = weeks.length;
+  let html = `<div class="heatmap-grid" style="grid-template-columns:22px repeat(${COLS},12px);grid-template-rows:14px repeat(7,12px);">`;
+  html += '<div></div>';
+  let lastM = -1;
+  for (let w=0; w<weeks.length; w++) {
+    const m = weeks[w][0].getMonth();
+    if (m!==lastM) { html+=`<div class="hm-month" style="grid-column:${w+2};grid-row:1">${MONTHS[m]}</div>`; lastM=m; }
+  }
+  for (let d=0; d<7; d++) {
     html+=`<div class="hm-day" style="grid-column:1;grid-row:${d+2}">${DAYS[d]}</div>`;
-    for(let w=0;w<weeks.length;w++){
-      const date=weeks[w][d];if(!date)continue;
-      const ds=date.toISOString().slice(0,10),cnt=counts[ds]||0;
+    for (let w=0; w<weeks.length; w++) {
+      const date=weeks[w][d]; if(!date) continue;
+      const ds=date.toISOString().slice(0,10), cnt=counts[ds]||0;
       const v=cnt===0?0:Math.min(5,Math.ceil(cnt/maxV*5));
       const future=date>today;
-      html+=`<div class="hm-cell" data-v="${future?'':v}" style="grid-column:${w+2};grid-row:${d+2};${future?'opacity:.15':''}" onmouseenter="showTip(event,'${ds}',${cnt})" onmouseleave="hideTip()"></div>`;
+      html+=`<div class="hm-cell" data-v="${future?'':v}" style="grid-column:${w+2};grid-row:${d+2};${future?'opacity:.3':''}" onmouseenter="showTip(event,'${ds}',${cnt})" onmouseleave="hideTip()"></div>`;
     }
   }
-  html+='</div>';
-  document.getElementById('heatmap').innerHTML=html;
+  html += '</div>';
+  document.getElementById('heatmap').innerHTML = html;
 }
 
 function renderRanking(entries) {
-  const totals={};for(const n of Object.keys(HABITS))totals[n]=0;
-  for(const e of entries)if(totals[e.name]!==undefined)totals[e.name]++;
-  const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('best').innerHTML=sorted.slice(0,4).map(([n,c],i)=>`<div class="rank-item"><div class="rank-medal">${medals[i]||'·'}</div><div class="rank-name">${n}</div><div class="rank-count">${c}×</div></div>`).join('');
-  document.getElementById('worst').innerHTML=sorted.slice(-4).reverse().map(([n,c])=>`<div class="rank-item"><div class="rank-medal">↗</div><div class="rank-name">${n}</div><div class="rank-count">${c}×</div></div>`).join('');
+  const totals = {}; for (const n of Object.keys(HABITS)) totals[n]=0;
+  for (const e of entries) if (totals[e.name]!==undefined) totals[e.name]++;
+  const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('best').innerHTML = sorted.slice(0,4).map(([n,c],i)=>
+    `<div class="rank-item"><div class="rank-medal">${MEDALS[i]||'·'}</div><div class="rank-name">${n}</div><div class="rank-count">${c}×</div></div>`).join('');
+  document.getElementById('worst').innerHTML = sorted.slice(-4).reverse().map(([n,c])=>
+    `<div class="rank-item"><div class="rank-medal">↗</div><div class="rank-name">${n}</div><div class="rank-count">${c}×</div></div>`).join('');
 }
 
-function showTip(e,date,cnt){const t=document.getElementById('tip');const d=new Date(date);const label=d.toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'});t.textContent=cnt>0?`${label} · ${cnt} Einheit${cnt>1?'en':''}`:label+' · nichts';t.style.display='block';t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-28)+'px';}
-function hideTip(){document.getElementById('tip').style.display='none';}
+function showTip(e,date,cnt) {
+  const t=document.getElementById('tip');
+  const d=new Date(date);
+  const label=d.toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'});
+  t.textContent=cnt>0?`${label} · ${cnt} Einheit${cnt>1?'en':''}`:label+' · nichts';
+  t.style.display='block'; t.style.left=(e.clientX+12)+'px'; t.style.top=(e.clientY-28)+'px';
+}
+function hideTip() { document.getElementById('tip').style.display='none'; }
 
-// Populate filter + wire up
-const sel=document.getElementById('hm-filter');
-for(const name of Object.keys(HABITS)){const o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);}
-sel.addEventListener('change',()=>renderHeatmap(ALL_ENTRIES,sel.value));
+const sel = document.getElementById('hm-filter');
+for (const name of Object.keys(HABITS)) {
+  const o=document.createElement('option'); o.value=name; o.textContent=name; sel.appendChild(o);
+}
+sel.addEventListener('change', () => renderHeatmap(ALL_ENTRIES, sel.value));
 
 loadData();
 </script>
