@@ -161,6 +161,16 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    transition: background .2s, border-color .2s;
+  }
+
+  .streak-item.done-today {
+    background: var(--green-bg);
+    border-color: var(--green-mid);
+  }
+
+  .streak-item.done-today .streak-name {
+    color: var(--green);
   }
 
   .streak-name {
@@ -425,6 +435,7 @@ function renderWeek(entries) {
 
 function renderStreaks(entries) {
   const byH = {}; for (const id of Object.keys(HABITS)) byH[id] = new Set();
+  const todayStr = today.toLocaleDateString('sv');
   for (const e of entries) if (byH[e.habit_id]) byH[e.habit_id].add(e.date.slice(0,10));
 
   function calcStreak(ds, goal) {
@@ -452,8 +463,10 @@ function renderStreaks(entries) {
     const em  = s>=7?'🔥':s>=3?'✨':'';
     const unit = goal===7?'Tage':'Wo.';
     const short = name.replace('nach dem Aufstehen','').replace('Feierabend-','').replace('übung','üb.').trim();
-    return `<div class="streak-item">
-      <div class="streak-name">${short}</div>
+    const wsStr = getMonday(today).toLocaleDateString('sv');
+    const doneToday = goal === 7 ? byH[id].has(todayStr) : [...byH[id]].some(d => d >= wsStr && d <= todayStr);
+    return `<div class="streak-item${doneToday ? ' done-today' : ''}">
+      <div class="streak-name">${short}${doneToday ? ' ✓' : ''}</div>
       <div class="streak-row">
         <div class="streak-value ${cls}">${s}</div>
         <div class="streak-unit">${unit} ${em}</div>
